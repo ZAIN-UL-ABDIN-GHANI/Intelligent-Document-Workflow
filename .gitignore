@@ -1,0 +1,8 @@
+env/*
+*.pyc
+.env
+.idea/
+__pycache__
+opt/*
+checkpoints.db
+data/sessions/*

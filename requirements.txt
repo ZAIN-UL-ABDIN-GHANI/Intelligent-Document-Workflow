@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+python-multipart
+langgraph
+langchain
+langchain-community
+langchain-openai
+faiss-cpu 
+pymupdf
+pillow
+flashrank
+aiosqlite
+langgraph-checkpoint-sqlite
+langchain-google-genai

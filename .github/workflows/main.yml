@@ -1,0 +1,13 @@
+name: Intelligent-Document-Workflow-pipeline 
+
+on:
+  push:
+    branches: 
+      - main
+jobs:
+  myjob:
+    runs-on: ubuntu-latest
+    steps:
+      - run: ls
+  
+    
