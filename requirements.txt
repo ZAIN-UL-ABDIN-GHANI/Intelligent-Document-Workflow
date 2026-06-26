@@ -12,3 +12,4 @@ flashrank
 aiosqlite
 langgraph-checkpoint-sqlite
 langchain-google-genai
+langchain-openai

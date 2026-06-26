@@ -1,0 +1,146 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply box-border;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-surface text-slate-100 font-sans antialiased;
+  }
+
+  ::-webkit-scrollbar {
+    @apply w-1.5;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-surface-border rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-600;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-500 text-white font-medium text-sm
+           hover:bg-brand-600 active:bg-brand-700 disabled:opacity-40 disabled:cursor-not-allowed
+           transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-brand-400 focus:ring-offset-2 focus:ring-offset-surface;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-slate-400 text-sm
+           hover:bg-surface-hover hover:text-slate-200 transition-all duration-150
+           focus:outline-none focus:ring-2 focus:ring-brand-400;
+  }
+
+  .card {
+    @apply bg-surface-card border border-surface-border rounded-xl;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium;
+  }
+
+  .input-field {
+    @apply w-full bg-surface border border-surface-border rounded-lg px-3 py-2 text-sm text-slate-100
+           placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent
+           transition-all duration-150;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-brand-400 to-accent-cyan bg-clip-text text-transparent;
+  }
+
+  .border-gradient {
+    background: linear-gradient(135deg, theme('colors.brand.500'), theme('colors.accent.cyan'));
+  }
+
+  .glass {
+    @apply backdrop-blur-sm bg-white/5 border border-white/10;
+  }
+}
+
+/* Prose styles for markdown rendering */
+.prose-dociq {
+  @apply text-slate-300 text-sm leading-relaxed;
+}
+
+.prose-dociq h1,
+.prose-dociq h2,
+.prose-dociq h3 {
+  @apply text-slate-100 font-semibold font-display mt-4 mb-2;
+}
+
+.prose-dociq h1 { @apply text-lg; }
+.prose-dociq h2 { @apply text-base; }
+.prose-dociq h3 { @apply text-sm; }
+
+.prose-dociq p {
+  @apply mb-3 last:mb-0;
+}
+
+.prose-dociq ul,
+.prose-dociq ol {
+  @apply pl-5 mb-3 space-y-1;
+}
+
+.prose-dociq ul { @apply list-disc; }
+.prose-dociq ol { @apply list-decimal; }
+
+.prose-dociq li {
+  @apply text-slate-300;
+}
+
+.prose-dociq code {
+  @apply font-mono text-xs bg-surface-border text-accent-cyan px-1.5 py-0.5 rounded;
+}
+
+.prose-dociq pre {
+  @apply bg-surface border border-surface-border rounded-lg p-4 overflow-x-auto mb-3;
+}
+
+.prose-dociq pre code {
+  @apply bg-transparent p-0 text-slate-300;
+}
+
+.prose-dociq blockquote {
+  @apply border-l-2 border-brand-500 pl-3 text-slate-400 italic mb-3;
+}
+
+.prose-dociq strong {
+  @apply text-slate-100 font-semibold;
+}
+
+.prose-dociq a {
+  @apply text-brand-400 hover:text-brand-300 underline underline-offset-2 transition-colors;
+}
+
+.prose-dociq table {
+  @apply w-full text-sm mb-3 border-collapse;
+}
+
+.prose-dociq th {
+  @apply text-left text-slate-400 font-medium border-b border-surface-border pb-2 pr-4;
+}
+
+.prose-dociq td {
+  @apply text-slate-300 border-b border-surface-border py-2 pr-4;
+}
+
+.prose-dociq hr {
+  @apply border-surface-border my-4;
+}

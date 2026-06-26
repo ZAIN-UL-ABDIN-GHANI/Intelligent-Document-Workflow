@@ -1,21 +1,40 @@
-
 import yaml
-import os
+from pathlib import Path
+
+
+# prompts.yaml is in the same folder as config.py
+PROMPT_FILE = Path(__file__).parent / "prompts.yaml"
+
 
 def get_versioned_prompt(agent_key: str, version: str):
     """
-    Retrieves a specific version of an agent's prompt from the YAML config.
+    Load a specific prompt version from prompts.yaml
     """
-    # Navigate to the root of the project to find the yaml
-    base_path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-    yaml_path = os.path.join(base_path, "app/core/prompts.yaml")
-    
-    with open(yaml_path, "r") as f:
+
+    # Debug (remove later if you want)
+    print(f"PROMPT FILE: {PROMPT_FILE}")
+    print(f"EXISTS: {PROMPT_FILE.exists()}")
+
+    if not PROMPT_FILE.exists():
+        raise FileNotFoundError(
+            f"prompts.yaml not found at: {PROMPT_FILE}"
+        )
+
+    with open(PROMPT_FILE, "r", encoding="utf-8") as f:
         config = yaml.safe_load(f)
-    
-    version_data = config.get(agent_key, {}).get("versions", {}).get(version)
-    
+
+    version_data = (
+        config.get(agent_key, {})
+        .get("versions", {})
+        .get(version)
+    )
+
     if not version_data:
-        raise ValueError(f"Prompt version {version} for {agent_key} not found.")
-        
-    return version_data["system_message"], version_data.get("human_template")
+        raise ValueError(
+            f"Prompt version '{version}' for '{agent_key}' not found."
+        )
+
+    return (
+        version_data["system_message"],
+        version_data.get("human_template", "")
+    )

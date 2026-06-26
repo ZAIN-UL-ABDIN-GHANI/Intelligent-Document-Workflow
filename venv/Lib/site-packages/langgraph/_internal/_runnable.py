@@ -8,6 +8,7 @@ import warnings
 from collections.abc import (
     AsyncIterator,
     Awaitable,
+    Callable,
     Coroutine,
     Generator,
     Iterator,
@@ -18,10 +19,9 @@ from contextvars import Context, Token, copy_context
 from functools import partial, wraps
 from typing import (
     Any,
-    Callable,
     Optional,
     Protocol,
-    Union,
+    TypeGuard,
     cast,
 )
 
@@ -42,7 +42,6 @@ from langchain_core.runnables.config import (
 from langchain_core.runnables.utils import Input, Output
 from langchain_core.tracers.langchain import LangChainTracer
 from langgraph.store.base import BaseStore
-from typing_extensions import TypeGuard
 
 from langgraph._internal._config import (
     ensure_config,
@@ -52,9 +51,11 @@ from langgraph._internal._config import (
 )
 from langgraph._internal._constants import (
     CONF,
+    CONFIG_KEY_NODE_ERROR,
     CONFIG_KEY_RUNTIME,
 )
 from langgraph._internal._typing import MISSING
+from langgraph.errors import NodeError
 from langgraph.types import StreamWriter
 
 try:
@@ -118,6 +119,19 @@ def set_config_context(
         ctx.run(_unset_config_context, config_token, run)
 
 
+def create_task_in_config_context(
+    coro_factory: Callable[[], Coroutine[Any, Any, Any]], config: RunnableConfig
+) -> asyncio.Task[Any]:
+    """Create an asyncio.Task that inherits `config` as the child runnable context.
+
+    `asyncio.create_task` snapshots the current contextvars onto the new task,
+    so calling `create_task` while the config context is set ensures the task
+    sees `config` via `var_child_runnable_config` and any tracing parent.
+    """
+    with set_config_context(config) as context:
+        return context.run(lambda: asyncio.create_task(coro_factory()))
+
+
 # Before Python 3.11 native StrEnum is not available
 class StrEnum(str, enum.Enum):
     """A string enum."""
@@ -136,7 +150,7 @@ KWARGS_CONFIG_KEYS: tuple[tuple[str, tuple[Any, ...], str, Any], ...] = (
         (
             RunnableConfig,
             "RunnableConfig",
-            Optional[RunnableConfig],
+            Optional[RunnableConfig],  # noqa: UP045
             "Optional[RunnableConfig]",
             inspect.Parameter.empty,
         ),
@@ -163,7 +177,7 @@ KWARGS_CONFIG_KEYS: tuple[tuple[str, tuple[Any, ...], str, Any], ...] = (
     (
         "store",
         (
-            Optional[BaseStore],
+            Optional[BaseStore],  # noqa: UP045
             "Optional[BaseStore]",
         ),
         "store",
@@ -181,6 +195,15 @@ KWARGS_CONFIG_KEYS: tuple[tuple[str, tuple[Any, ...], str, Any], ...] = (
         # we never hit this block, we just inject runtime directly
         "N/A",
         inspect.Parameter.empty,
+    ),
+    (
+        "error",
+        (NodeError, "NodeError"),
+        # we never hit this block, we read directly from configurable
+        "N/A",
+        # default to None so non-handler nodes that happen to type a parameter
+        # `error: NodeError` don't blow up; handlers always receive a NodeError.
+        None,
     ),
 )
 """List of kwargs that can be passed to functions, and their corresponding
@@ -241,15 +264,15 @@ class _RunnableWithConfigWriterStore(Protocol[Input, Output]):
     ) -> Output: ...
 
 
-RunnableLike = Union[
-    LCRunnableLike,
-    _RunnableWithWriter[Input, Output],
-    _RunnableWithStore[Input, Output],
-    _RunnableWithWriterStore[Input, Output],
-    _RunnableWithConfigWriter[Input, Output],
-    _RunnableWithConfigStore[Input, Output],
-    _RunnableWithConfigWriterStore[Input, Output],
-]
+RunnableLike = (
+    LCRunnableLike
+    | _RunnableWithWriter[Input, Output]
+    | _RunnableWithStore[Input, Output]
+    | _RunnableWithWriterStore[Input, Output]
+    | _RunnableWithConfigWriter[Input, Output]
+    | _RunnableWithConfigStore[Input, Output]
+    | _RunnableWithConfigWriterStore[Input, Output]
+)
 
 
 class RunnableCallable(Runnable):
@@ -355,6 +378,8 @@ class RunnableCallable(Runnable):
             kw_value: Any = MISSING
             if kw == "config":
                 kw_value = config
+            elif kw == "error":
+                kw_value = config.get(CONF, {}).get(CONFIG_KEY_NODE_ERROR, MISSING)
             elif runtime:
                 if kw == "runtime":
                     kw_value = runtime
@@ -427,6 +452,8 @@ class RunnableCallable(Runnable):
             kw_value: Any = MISSING
             if kw == "config":
                 kw_value = config
+            elif kw == "error":
+                kw_value = config.get(CONF, {}).get(CONFIG_KEY_NODE_ERROR, MISSING)
             elif runtime:
                 if kw == "runtime":
                     kw_value = runtime
@@ -482,9 +509,9 @@ def is_async_callable(
 ) -> TypeGuard[Callable[..., Awaitable]]:
     """Check if a function is async."""
     return (
-        asyncio.iscoroutinefunction(func)
+        inspect.iscoroutinefunction(func)
         or hasattr(func, "__call__")
-        and asyncio.iscoroutinefunction(func.__call__)
+        and inspect.iscoroutinefunction(func.__call__)
     )
 
 
@@ -534,9 +561,9 @@ def coerce_to_runnable(
 
 
 class RunnableSeq(Runnable):
-    """Sequence of Runnables, where the output of each is the input of the next.
+    """Sequence of `Runnable`, where the output of each is the input of the next.
 
-    RunnableSeq is a simpler version of RunnableSequence that is internal to
+    `RunnableSeq` is a simpler version of `RunnableSequence` that is internal to
     LangGraph.
     """
 
@@ -550,7 +577,7 @@ class RunnableSeq(Runnable):
 
         Args:
             steps: The steps to include in the sequence.
-            name: The name of the Runnable. Defaults to None.
+            name: The name of the `Runnable`.
 
         Raises:
             ValueError: If the sequence has less than 2 steps.
