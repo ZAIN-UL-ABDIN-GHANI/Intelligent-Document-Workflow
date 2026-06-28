@@ -2,6 +2,8 @@
 
 <img src="images.png" alt="DocIQ — AI-Powered Document Intelligence Interface" width="100%" style="border-radius: 8px; margin-bottom: 16px;" />
 
+<img src="image.png" alt="DocIQ — System Architecture Diagram" width="100%" style="border-radius: 8px; margin-bottom: 16px;" />
+
 # DocIQ — AI-Powered Document Intelligence Backend
 
 **A production-grade, multi-agent backend for ingesting, processing, and querying complex documents.**
@@ -41,6 +43,8 @@ DocIQ transforms static documents into interactive knowledge bases. Upload any P
 ## System Architecture
 
 DocIQ is built on a **Graph-based State Machine** pattern, where each agent is a dedicated node responsible for a single concern. Documents enter the graph at ingestion and flow through the pipeline until a grounded answer is returned.
+
+![DocIQ System Architecture](image.png)
 
 ```
 Document / Query
@@ -129,6 +133,7 @@ Monitors conversation length after each QA turn. When history exceeds a configur
 │   ├── schema/               # Pydantic request/response models
 │   └── main.py               # FastAPI application entry point
 ├── data/                     # Local vector stores (FAISS) and uploaded files
+├── image.png                 # System architecture diagram
 ├── images.png                # UI screenshot
 ├── .env.example              # Environment variable template
 ├── requirements.txt          # Python dependencies
@@ -147,7 +152,7 @@ Monitors conversation length after each QA turn. When history exceeds a configur
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/CH-Umar-Aslam/Intelligent-Document-Workflow.git
+git clone https://github.com/ZAIN-UL-ABDIN-GHANI/Intelligent-Document-Workflow.git
 cd "Intelligent Document Backend"
 ```
 
