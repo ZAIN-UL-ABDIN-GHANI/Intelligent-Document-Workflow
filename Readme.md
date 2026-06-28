@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="images.png" alt="DocIQ — AI-Powered Document Intelligence Interface" width="100%" style="border-radius: 8px; margin-bottom: 16px;" />
 
-<img src="image.png" alt="DocIQ — System Architecture Diagram" width="100%" style="border-radius: 8px; margin-bottom: 16px;" />
+
+<img src="images.png" alt="DocIQ — System Architecture Diagram" width="100%" style="border-radius: 8px; margin-bottom: 16px;" />
 
 # DocIQ — AI-Powered Document Intelligence Backend
 
