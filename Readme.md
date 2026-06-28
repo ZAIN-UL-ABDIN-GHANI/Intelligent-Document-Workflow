@@ -2,7 +2,7 @@
 
 
 
-<img src="iamges.png" alt="DocIQ — System Architecture Diagram" width="100%" style="border-radius: 8px; margin-bottom: 16px;" />
+<img src="iamges.PNG" alt="DocIQ — System Architecture Diagram" width="100%" style="border-radius: 8px; margin-bottom: 16px;" />
 
 # DocIQ — AI-Powered Document Intelligence Backend
 
